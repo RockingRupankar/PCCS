@@ -1,0 +1,20 @@
+# Default ICC hyper-parameters. Loaded by icc.load_icc_config and checked against the code defaults in tests/test_config.py.
+icc:
+  n_clusters: 4
+  n_views: 20
+  families: [seed, row, feature, noise, combined]
+  row_frac: 0.8
+  feat_frac: 0.5
+  noise_sd: 0.25
+  base_methods: [kmeans, ward]
+  kmeans_n_init: 3
+  use_stability_weights: true
+  weight_power: 2.0
+  use_family_fusion: true
+  invariance_lambda: 0.5
+  linkage: average
+  min_cluster_frac: 0.02
+  feature_weighted_assignment: true
+  hi: 0.75
+  lo: 0.50
+  random_state: 0

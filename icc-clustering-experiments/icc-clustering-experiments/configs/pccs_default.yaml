@@ -1,0 +1,34 @@
+# Default PCCS settings (see src/icc/pccs.py and docs/pccs_traceability.md). Checked against the code in tests/test_config.py.
+pccs:
+  n_clusters: 4
+  methods: [kmeans, fcm, dbscan, hierarchical]
+  families: [algorithmic, sampling, feature, measurement, technical, distribution]
+  levels:
+    algorithmic: [0.0, 1.0]        # 0 = seeds only, 1 = seeds + hyper-parameter jitter
+    sampling: [0.1, 0.3, 0.5]      # fraction of rows removed
+    feature: [0.2, 0.5, 0.8]       # fraction of features masked
+    measurement: [0.25, 0.5, 1.0]  # noise sd / outlier / missingness intensity
+    technical: [0.1, 0.25, 0.5]    # batch offset sd (standardised units)
+    distribution: [0.5, 1.0, 2.0]  # covariate-shift strength
+  repetitions: 2
+  baseline_seeds: 3
+  fuzzifier: 1.3
+  dbscan_min_samples: 5
+  dbscan_eps_quantile: 0.6
+  dbscan_eps_scale: 1.2
+  n_batches: 3
+  interaction: true
+  interaction_pairs: null
+  interaction_repetitions: 2
+  use_reliability_weights: true
+  weight_power: 2.0
+  family_weighting: reliability
+  consistency_lambda: 0.5
+  linkage: average
+  min_cluster_frac: 0.02
+  hi: 0.75
+  lo: 0.50
+  max_response_sd: 0.15
+  min_member_agreement: 0.2
+  interaction_threshold: 0.15
+  random_state: 0

@@ -1,0 +1,17 @@
+experiment: exp2_ablation
+data: {generator: pccs, profiles: [noisy, severe], n_samples: 1200, generator_seeds: [42, 43, 44]}
+variants:
+  full: {}
+  no_stability_weights: {use_stability_weights: false}
+  no_family_fusion: {use_family_fusion: false}
+  no_invariance: {invariance_lambda: 0.0}
+  invariance_only: {invariance_lambda: 1.0}
+  no_row_views: {families: [seed, feature, noise, combined]}
+  no_feature_views: {families: [seed, row, noise]}
+  no_noise_views: {families: [seed, row, feature]}
+  no_combined_views: {families: [seed, row, feature, noise]}
+  seed_only_views: {families: [seed]}
+  kmeans_only: {base_methods: [kmeans]}
+  ward_only: {base_methods: [ward]}
+  kmeans_ward_gmm: {base_methods: [kmeans, ward, gmm]}
+baselines: [kmeans, eac]

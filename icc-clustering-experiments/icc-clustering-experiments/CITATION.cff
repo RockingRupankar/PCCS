@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software or its experiment results, please cite it as below."
+title: "Cluster Stability-Based Ensemble Learning for Noisy High-Dimensional Data: PCCS and ICC experiments"
+type: software
+version: "0.1.0"
+date-released: "2026-10-11"
+# TODO: replace the placeholders below before publishing.
+authors:
+  - family-names: "<FAMILY NAME>"
+    given-names: "<GIVEN NAME>"
+repository-code: "https://github.com/AkashKundu114/<REPOSITORY-NAME>"
+license: MIT
+keywords:
+  - clustering
+  - consensus clustering
+  - cluster stability
+  - ensemble learning
+  - high-dimensional data

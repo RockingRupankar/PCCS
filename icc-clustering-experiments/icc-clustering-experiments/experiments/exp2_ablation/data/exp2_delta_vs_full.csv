@@ -1,0 +1,15 @@
+variant,noisy,severe
+baseline_eac,-0.012,0.007
+baseline_kmeans,-0.007,-0.036
+invariance_only (lambda=1),-0.013,0.016
+kmeans+ward+gmm,0.01,0.053
+kmeans_only,-0.003,-0.035
+no_combined_views,-0.011,-0.002
+no_family_fusion (pooled),-0.003,-0.029
+no_feature_views,-0.007,-0.053
+no_invariance (lambda=0),-0.003,-0.02
+no_noise_views,-0.003,-0.112
+no_row_views,-0.008,-0.07
+no_stability_weights,-0.004,-0.015
+seed_only_views,-0.187,-0.112
+ward_only,-0.186,-0.112

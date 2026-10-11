@@ -1,0 +1,5 @@
+profile,reliability,n,mean_error
+noisy,ambiguous,7,0.18572184422461677
+noisy,conditionally_invariant,13,0.09032130808870466
+severe,ambiguous,16,0.6067419973807558
+severe,perturbation_fragile,4,0.6157408782975862
