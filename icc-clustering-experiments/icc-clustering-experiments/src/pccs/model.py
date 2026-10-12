@@ -31,25 +31,27 @@ class PCCSConfig:
     baseline_seeds: int = 3
     fuzzifier: float = 1.3
     dbscan_min_samples: int = 5
-    dbscan_eps_quantile: float = 0.5
-    dbscan_eps_scale: float = 1.0
-    hierarchical_linkage: str = "ward"
+    dbscan_eps_quantile: float = 0.6
+    dbscan_eps_scale: float = 1.2
     n_batches: int = 3
     interaction: bool = True
     interaction_pairs: Optional[tuple] = None
     interaction_repetitions: int = 2
     use_reliability_weights: bool = True
+    weight_power: float = 2.0
     family_weighting: str = "reliability"    # "reliability" | "equal"
     consistency_lambda: float = 0.5          # 0 = weighted mean over families, 1 = minimum over families
     linkage: str = "average"
     min_cluster_frac: float = 0.02
-    clip_mad: float = 4.0
-    pca_variance: Optional[float] = None
     hi: float = 0.75
     lo: float = 0.50
     max_response_sd: float = 0.15
+    min_member_agreement: float = 0.2
     interaction_threshold: float = 0.15
     random_state: int = 0
+    clip_mad: float = 4.0
+    pca_variance: Optional[float] = None
+    hierarchical_linkage: str = "ward"
 
 
 class PCCS:

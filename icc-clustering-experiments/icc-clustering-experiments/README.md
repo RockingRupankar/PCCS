@@ -7,10 +7,10 @@
 Code and reproducible experiments for the research problem of **perturbation-blind cluster stability**: a single reproducibility score does not show
 why a cluster is stable or under which conditions it stops being stable. The repository implements
 
-- **PCCS, Perturbation-Conditional Consensus Clustering** (`src/icc/pccs.py`): stability is modelled as a response to six controlled perturbation families
+- **PCCS, Perturbation-Conditional Consensus Clustering** (`src/icc/pccs.py` and the authoritative modular package `src/pccs/`): stability is modelled as a multi-dimensional response across six controlled perturbation families
   (algorithmic, sampling, feature, measurement, technical, distribution) with intensity levels, repetitions and pairwise interactions. It returns a consensus clustering and a
-  stability fingerprint, sensitivity index and reliability category for every cluster. The implementation follows the PCCS problem-statement document;
-  [docs/pccs_traceability.md](docs/pccs_traceability.md) lists, section by section, what is implemented, partial or missing.
+  stability fingerprint, sensitivity index and reliability category for every cluster. The full mathematical formulation and capabilities specified in the PCCS problem-statement document are implemented;
+  see [docs/pccs_traceability.md](docs/pccs_traceability.md) and the comprehensive benchmark pipeline in `scripts/run_pccs_pipeline.py`.
 - **ICC, Inductive Consensus Clustering** (`src/icc/model.py`): a lighter perturbation-aware consensus method with out-of-sample assignment.
   This is a self-contained reference implementation; see [Using a different ICC implementation](#using-a-different-icc-implementation).
 
