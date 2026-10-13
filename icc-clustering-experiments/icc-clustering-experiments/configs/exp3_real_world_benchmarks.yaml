@@ -1,5 +1,0 @@
-experiment: exp3_real_world_benchmarks
-datasets: {iris: {k: 3}, wine: {k: 3}, breast_cancer: {k: 2}, digits: {k: 10}}   # scikit-learn bundled data
-corruption: {extra_noise_features: 100, measurement_noise_sd: 0.3, outlier_row_fraction: 0.02, missing_row_fraction: 0.03, seed: 7}
-methods: [kmeans, ward, gmm_diag, spectral_knn, eac, icc_v1]
-seeds: 5

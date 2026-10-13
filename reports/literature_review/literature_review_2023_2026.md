@@ -1,0 +1,51 @@
+# Literature Review: Cluster Stability & Ensemble Learning (2023–2026)
+**Project:** Perturbation-Conditional Consensus Clustering (PCCS)  
+**Date:** 2026-10-13  
+**Focus:** Perturbation-based consensus clustering, cluster stability under heterogeneous perturbations, uncertainty-weighted ensembles, and cluster-level reliability.
+
+---
+
+## 1. Overview and Problem Context
+
+Conventional cluster stability methods (e.g., Monti et al., 2003; Fred & Jain, 2005) evaluate reproducibility by resampling or random initialization and collapse partition similarity into a single scalar score (such as average ARI or dispersion coefficient). However, in high-dimensional and noisy biological or technical data, stability is multi-faceted: a cluster may withstand observation subsampling while disintegrating upon feature dropout, measurement noise, batch effects, or covariate shifts.
+
+This review systematically examines recent literature from 2023 to October 2026 addressing ensemble clustering, uncertainty estimation, and perturbation sensitivity.
+
+---
+
+## 2. Comprehensive Literature Analysis (2023–2026)
+
+| Citation | Research Problem | Proposed Method | Datasets Evaluated | Main Findings | Limitations Stated by Authors | Potential Gap Relative to PCCS | Evidence Location | Proposed Follow-Up in PCCS |
+|---|---|---|---|---|---|---|---|---|
+| **Li et al. (2023)** *Sci. Rep.*, 13:22145 | Subjective preset parameters; one-sided co-association; lack of macro-level conflict resolution. | Dual-level clustering ensemble with backward ensemble selection and dual relation matrices. | Benchmark UCI datasets (Iris, Wine, Breast Cancer, etc.) | Adaptively filters redundant base clusterings; outperforms standard single-consensus methods. | High computational overhead for very large samples; selection relies on empirical diversity heuristics. | Does not model stability as a function of perturbation type or intensity; no cluster-level fingerprints. | Section 2 & 4.1 | Benchmark as ensemble selection baseline; evaluate cluster-specific vs partition-wide selection. |
+| **Zhou et al. (2023)** *Inf. Fusion*, 100:101910 | Lack of ground truth induces instability in unsupervised feature selection; single-level ensembles ignore downstream clustering. | Bi-level ensemble feature selection (BLFSE) integrating feature importance and clustering consensus. | High-dimensional biological and image datasets | Synchronizing feature selection and cluster consensus improves partition accuracy and representation stability. | Iterative self-paced learning is computationally intensive; sensitive to initial feature weighting. | Focuses on static feature ranking rather than dynamic stability response under controlled feature dropout. | Section 3.2 | Evaluate feature perturbation response curves ($S_{k, \text{feat}}$) across dimensions. |
+| **Gu et al. (2024)** *Expert Syst. Appl.*, 238:121672 | Local weighted ensemble clustering ignores base clustering labels and hierarchical structural uncertainties. | Two-tier uncertainty measurement (TWEC) combining entropy-based cluster uncertainty with global weighting. | 16 UCI benchmark datasets, synthetic Gaussians | Two-tier weighting suppresses noisy clusters and enhances consensus robustness over unweighted EAC. | Evaluates only random algorithm initializations; does not assess systematic technical or measurement noise. | Collapses uncertainty into a single scalar tier; perturbation-blind to distinct noise modalities. | Section 3.3 & 5.2 | Implement TWEC as a core comparison baseline in Experiment 5 (Ablation & Baselines). |
+| **Aktaş et al. (2024)** *Eur. J. Oper. Res.*, 314:1065 | Full-ensemble consensus incorporates noisy base partitions; selecting subsets requires balancing conflicting criteria. | Multi-objective optimization (MOO) balancing size, coverage, and diversity for ensemble selection. | UCI datasets, customer segmentation data | Pareto-optimal ensemble selection outperforms full ensemble while reducing runtime. | Scalability is bounded by combinatorial optimization solvers; assumes uniform observation quality. | Selection is conducted at the partition level, failing to preserve clusters that are robust only in subsets of members. | Section 4 | Contrast global ensemble selection with cluster-level reliability modulation. |
+| **Yousefi (2024)** *bioRxiv*, 2024.03.21.586064 | Bioinformatics clustering is sensitive to hyperparameters, random seeds, and measurement platforms. | Systematic Consensus Clustering framework with stability score diagnostics. | Simulated single-cell and bulk gene expression profiles | Consensus stability scores detect stable subtypes across gene expression matrices. | Relies primarily on subsampling/bootstrapping; does not systematically test batch or distribution shifts. | Single scalar stability score obscures condition-specific fragility (e.g., batch vulnerability). | Results Section | Formulate the 6-family stability tensor to unmask platform-specific vs sampling invariance. |
+| **Guo et al. (2024)** *ICML 2024*, arXiv:2301.12379 | Real-world federated learning faces simultaneous diverse distribution shifts (feature, label, concept). | FedRC: Robust clustering framework using bi-level optimization under concurrent distribution shifts. | Non-IID CIFAR-10, Federated EMNIST, synthetic shifts | Identifies that addressing isolated shifts fails when shifts co-occur; FedRC preserves cluster structure across clients. | Assumes federated client partitioning; requires iterative optimization. | Focuses on client clustering rather than cluster stability fingerprints and explicit interaction modeling. | Section 4 & 5 | Formulate Factorial Perturbation Interaction ($\Delta_{pq}$) in Experiment 4. |
+| **Tabatabaee et al. (2024)** *PLOS Complex Syst.*, arXiv:2407.03577 | Consensus clustering on large networks incurs high computational overhead from dense co-association matrices. | FastEnsemble: Scalable consensus clustering for community detection (Leiden/Louvain). | Large-scale synthetic and empirical networks ($N > 10^5$) | Achieves linear/near-linear scaling without sacrificing partition modularity or consensus accuracy. | Restricted to graph/network topology; does not address continuous high-dimensional features. | Graph-centric; does not measure cluster response to feature or measurement perturbations. | Methodology Section | Apply chunked sparse tensor representations to prevent quadratic memory explosion on Covertype. |
+| **Gao et al. (2026)** *Behav. Res. Methods*, s13428-026-03158-y | Practitioners misapply single clustering runs due to lack of practical guidance on ensemble consensus and validation. | Comprehensive tutorial and workflow for ensemble clustering with co-association aggregation in R/Python. | Simulated phenotypes, psychiatric assessment data | Demonstrates that ensemble consensus mitigates seed sensitivity and provides reproducible phenotypic profiles. | Acknowledges that standard consensus fails to explain *why* clusters fail under external measurement changes. | Confirms the open research problem: conventional consensus is perturbation-blind. | Section 6 (Discussion) | Serve as state-of-the-art methodology tutorial establishing the necessity of PCCS. |
+
+---
+
+## 3. Research Gap Matrix
+
+| Identified Research Gap | Literature Evidence | PCCS Architectural Mechanism | Executed Validation Experiment |
+|---|---|---|---|
+| **Gap 1: Perturbation Blindness** | Gao et al. (2026), Yousefi (2024) observe that scalar stability aggregates heterogeneous stresses into one score, obscuring failure causes. | Multi-dimensional Stability Tensor $S \in [0, 1]^{N \times N \times P}$ spanning 6 controlled perturbation families. | **Experiment 2 (Sweeps):** Unmasks divergent family response curves across datasets. |
+| **Gap 2: Masked Local Fragility** | Gu et al. (2024) note that high global partition stability can coexist with severe local cluster uncertainty. | Cluster Stability Fingerprint $F_k \in [0, 1]^P$ and Perturbation Sensitivity Index ($PSI_k$). | **Experiment 3 (Fragility):** Demonstrates detection of fragile sub-clusters hidden by high global ARI. |
+| **Gap 3: Unmodeled Perturbation Interactions** | Guo et al. (2024) demonstrate that concurrent shifts cause catastrophic degradation not predictable from isolated tests. | Factorial Interaction Analysis ($\Delta_{pq} = \frac{S_p S_q}{S_0} - S_{pq}$) with bootstrap standard errors. | **Experiment 4 (Interactions):** Discovers synergistic collapse under combined feature and measurement noise. |
+| **Gap 4: Circular Consensus Weighting** | Traditional weighted consensus (Gu et al., 2024) weights partitions by reference agreement, biasing towards the baseline. | Non-circular reliability modulation ($W_k = (1 - PSI_k)^\gamma$) fused with invariant core intersection ($\lambda \min_p S_{ij}^{(p)}$). | **Experiment 5 (Consensus & Baselines):** Statistically validates superiority over unweighted EAC and TWEC. |
+| **Gap 5: Unsupervised Falsification** | Prior benchmarks use supervised labels to classify clusters or lack null controls against spurious clusters. | Purely unsupervised stability thresholding ($PSI$) distinguishing genuine latent structure from anisotropic null noise. | **Experiment 1 (Synthetic Ground Truth):** Distinguishes structured clusters from nulls without labels. |
+
+---
+
+## 4. Distinction Between Paper Limitations and Novel PCCS Claims
+
+1. **Acknowledged Limitations in Literature:**
+   - Gao et al. (2026) and Yousefi (2024) explicitly state that scalar consensus clustering cannot diagnose whether an unstable cluster failed due to sampling variation or measurement noise.
+   - Gu et al. (2024) state that their two-tier uncertainty model does not account for variable feature reliability or external distribution shifts.
+2. **Observed Limitations:**
+   - Li et al. (2023) and Aktaş et al. (2024) conduct ensemble selection at the global partition level, inadvertently discarding partitions that contain highly accurate sub-clusters.
+3. **PCCS Novelty Claim:**
+   - PCCS is the first framework to unify **multi-family perturbation modeling**, **cluster-level stability fingerprinting**, **factorial interaction analysis**, and **reliability-modulated consensus clustering** into an end-to-end, mathematically rigorous clustering pipeline.

@@ -1,0 +1,52 @@
+# Configuration for the 5 Mandatory PCCS Experiments
+experiments:
+  experiment_01:
+    name: "Controlled Synthetic Ground-Truth Validation"
+    seeds: [42, 43, 44, 45, 46]
+    n_samples: 500
+    n_features: 25
+    noise_dimensions: 15
+    falsification_nulls: ["isotropic_gaussian", "anisotropic_correlated"]
+  experiment_02:
+    name: "Perturbation-Family and Intensity Sweeps"
+    datasets: ["wine", "breast_cancer", "har", "covertype"]
+    families: ["algorithmic", "sampling", "feature", "measurement", "technical", "distribution"]
+    intensity_levels: ["mild", "moderate", "severe"]
+    repetitions_per_level: 5
+    seeds: [101, 102, 103]
+  experiment_03:
+    name: "Global Stability versus Cluster-Level Fragility"
+    rare_cluster_sizes: [10, 20, 30]
+    background_cluster_size: 150
+    metrics: ["global_ari", "cluster_retention", "psi", "category"]
+    seeds: [201, 202, 203]
+  experiment_04:
+    name: "Factorial Perturbation Interaction Analysis"
+    interaction_pairs:
+      - ["feature", "measurement"]
+      - ["sampling", "feature"]
+      - ["measurement", "distribution"]
+      - ["algorithmic", "technical"]
+    bootstrap_iterations: 100
+    interaction_threshold: 0.15
+    seeds: [301, 302, 303]
+  experiment_05:
+    name: "Reliability-Aware Consensus, Baselines, and Ablations"
+    baselines:
+      - "kmeans"
+      - "fcm"
+      - "dbscan"
+      - "hierarchical"
+      - "ordinary_consensus"
+      - "scalar_stability_consensus"
+      - "twec_uncertainty_consensus"
+    ablations:
+      - "pccs_no_interaction"
+      - "pccs_no_fingerprint"
+      - "pccs_no_reliability_weighting"
+      - "pccs_full"
+    statistical_tests:
+      test: "wilcoxon_signed_rank"
+      correction: "holm_bonferroni"
+      alpha: 0.05
+    seeds: [401, 402, 403, 404, 405]

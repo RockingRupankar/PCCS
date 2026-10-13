@@ -1,6 +1,0 @@
-experiment: exp1_generalization
-data: {generator: pccs, profiles: [clean, noisy, severe], n_samples: 2000, generator_seed: 42, test_rows: 800, test_split_seed: 0}
-training_sizes: [100, 200, 400, 800, 1200]
-seeds: [0, 1, 2]
-methods: [kmeans, ward, gmm_diag, spectral_knn, eac, icc_v1]
-out_of_sample_rule: {kmeans: predict, gmm_diag: predict, ward: nearest_centroid, spectral_knn: knn10, eac: nearest_centroid, icc_v1: feature_weighted_nearest_centroid}

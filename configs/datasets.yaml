@@ -1,0 +1,38 @@
+# Configuration for Benchmark and Synthetic Datasets
+datasets:
+  wine:
+    path: "data/processed/wine.csv"
+    labels_path: "data/processed/wine_labels.csv"
+    n_clusters: 3
+    n_features: 13
+    n_samples: 178
+  breast_cancer:
+    path: "data/processed/breast_cancer.csv"
+    labels_path: "data/processed/breast_cancer_labels.csv"
+    n_clusters: 2
+    n_features: 30
+    n_samples: 569
+  har:
+    path: "data/processed/har.csv"
+    labels_path: "data/processed/har_labels.csv"
+    n_clusters: 6
+    n_features: 561
+    n_samples: 10299
+    subsample_n: 1500
+  covertype:
+    path: "data/processed/covertype_subsample.csv"
+    labels_path: "data/processed/covertype_labels.csv"
+    n_clusters: 7
+    n_features: 54
+    n_samples: 2500
+  synthetic:
+    regimes:
+      - "spherical_separated"
+      - "anisotropic_elongated"
+      - "non_convex_rings"
+      - "overlapping"
+      - "rare_cluster"
+      - "high_dimensional_noise"
+    default_n: 500
+    default_d: 20
+    default_k: 4

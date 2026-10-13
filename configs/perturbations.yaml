@@ -1,0 +1,34 @@
+# Configuration for the 6 Perturbation Families and Intensities
+perturbations:
+  families:
+    algorithmic:
+      type: "hyperparameter_and_seed_jitter"
+      mild: 0.1
+      moderate: 0.25
+      severe: 0.5
+    sampling:
+      type: "observation_subsampling_without_replacement"
+      mild: 0.90
+      moderate: 0.75
+      severe: 0.50
+    feature:
+      type: "feature_masking_dropout"
+      mild: 0.10
+      moderate: 0.25
+      severe: 0.50
+    measurement:
+      type: "additive_gaussian_and_heavy_tailed_noise"
+      mild: 0.10
+      moderate: 0.30
+      severe: 0.60
+    technical:
+      type: "batch_offset_and_variance_scale"
+      mild: 0.20
+      moderate: 0.50
+      severe: 1.00
+    distribution:
+      type: "covariate_shift_importance_resampling"
+      mild: 0.20
+      moderate: 0.50
+      severe: 0.80
+  default_repetitions: 3

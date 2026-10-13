@@ -1,0 +1,18 @@
+# Configuration for Perturbation-Aware Consensus Construction
+consensus:
+  fusion:
+    method: "invariant_core_reliability_modulation"
+    consistency_lambda: 0.5    # 0 = reliability-weighted mean across families, 1 = minimum over families
+    weight_power: 2.0          # gamma in W_k = (1 - PSI_k)^gamma
+    linkage: "average"
+    min_cluster_frac: 0.02
+  reliability_classification:
+    hi: 0.75                   # High stability threshold
+    lo: 0.50                   # Low stability threshold
+    max_response_sd: 0.15      # Maximum allowable stability variance
+    interaction_threshold: 0.15 # Maximum allowable synergistic drop
+  categories:
+    - "globally_invariant"
+    - "conditionally_invariant"
+    - "perturbation_fragile"
+    - "ambiguous"
