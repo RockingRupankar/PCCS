@@ -55,6 +55,8 @@ This milestone marks the complete, audited implementation of the authoritative r
   - `reports/audit/final_acceptance_matrix.md`: Section 17 acceptance audit verifying 17/17 criteria PASS.
   - `pccs_traceability.md`: Comprehensive traceability matrix connecting specification requirements to code, mathematics, tests, and raw evidence.
   - `references/dataset_sources.md` & `data/manifests/dataset_manifest.csv`: Formal provenance, licenses, and SHA-256 hashes for UCI Wine, Breast Cancer Diagnostic, HAR, and Covertype datasets.
+  - `experiments/`: Standalone modular runners (`run.py`) and dedicated documentation across all 5 experiment subdirectories (`experiment_01` through `experiment_05`), enabling independent single-study execution.
+  - `README.md`: Comprehensive scientific documentation for all 5 experiments with full quantitative result tables, mathematical models, and publication figure references.
 
 #### Fixed & Corrected
 - **Consensus Circularity:** Eliminated circular partition-level weighting (`ari_ref` against an unperturbed baseline consensus) which previously penalized valid structural discoveries under noise. Replaced with cluster-level reliability modulation ($W_k = (1 - PSI_k)^\gamma$) and invariant core fusion ($\min_p S_{ij}^{(p)}$).
