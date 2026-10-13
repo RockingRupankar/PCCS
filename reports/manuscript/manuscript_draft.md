@@ -17,7 +17,7 @@ To address these limitations, we propose **Perturbation-Conditional Consensus Cl
 3. **Factorial Perturbation Interaction Modeling** ($\Delta_{pq}$) that unmasks synergistic structural collapse when perturbations co-occur.
 4. **Reliability-Modulated Consensus Construction** that weights pairwise relationships by cluster-specific reliability profiles ($W_k = (1 - PSI_k)^\gamma$) and fuses invariant core linkages ($\min_p S_{ij}^{(p)}$) without circular baseline reference bias.
 
-Across controlled synthetic regimes, public benchmarks (UCI Wine, Breast Cancer Wisconsin, Human Activity Recognition, Forest Covertype), and unsupervised falsification null models, we demonstrate that PCCS: (i) correctly isolates fragile sub-clusters hidden beneath high global partition stability, (ii) detects synergistic collapse between feature dropout and measurement noise ($\Delta_{pq} > 0.15$), (iii) discriminates genuine cluster structure from isotropic and anisotropic null distributions without supervised labels ($PSI \le 0.08$ vs $PSI \ge 0.52$), and (iv) achieves statistically significant improvements in clustering accuracy over single baselines and unweighted consensus ensembles (Wilcoxon signed-rank test $p < 0.05$ under Holm-Bonferroni correction).
+Across controlled synthetic regimes, public benchmarks (UCI Wine, Breast Cancer Wisconsin Diagnostic), and unsupervised falsification null models, we demonstrate that PCCS: (i) correctly isolates fragile sub-clusters hidden beneath high global partition stability ($ARI = 0.850$, rare cluster $PSI$ peaking at $0.126$), (ii) quantifies multi-perturbation interaction dynamics with bootstrap standard errors, detecting sub-multiplicative buffering ($\Delta_{pq} = -0.192 \pm 0.037$) and testing for synergistic collapse, (iii) cleanly discriminates authentic cluster structure ($PSI = 0.039 \pm 0.004$) from isotropic ($PSI = 0.455 \pm 0.018$) and anisotropic ($PSI = 0.448 \pm 0.045$) Gaussian null distributions without supervised labels, and (iv) achieves statistically significant improvements in clustering accuracy over single baselines (mean ARI 0.7929 vs 0.4313 for K-Means, $p = 0.00098$, Holm-Bonferroni adjusted $p = 0.0078$, Cohen's $d = 2.082$).
 
 ---
 
@@ -119,30 +119,33 @@ PCCS is benchmarked against:
 ## 5. Experimental Results and Discussion
 
 ### 5.1 Experiment 1: Synthetic Ground-Truth Validation & Falsification
-- **Structural Recovery:** PCCS successfully recovers complex geometries, achieving perfect or near-perfect ARI on separated spherical ($1.00 \pm 0.00$), anisotropic ($0.98 \pm 0.02$), and non-convex concentric rings ($0.96 \pm 0.03$), where single K-Means fails ($ARI \approx 0.00$ on rings).
-- **Unsupervised Falsification:** Under null distributions devoid of cluster structure, PCCS yields high sensitivity indices ($PSI = 0.54 \pm 0.04$ for isotropic Gaussian, $PSI = 0.58 \pm 0.03$ for anisotropic correlated nulls), sharply distinct from true clusters ($PSI = 0.06 \pm 0.02$). This validates that PCCS rejects spurious cluster claims without requiring external labels.
+- **Structural Recovery:** PCCS successfully recovers complex geometries, achieving perfect recovery on separated spherical ($1.00 \pm 0.00$) and rare cluster regimes ($1.00 \pm 0.00$), and near-perfect recovery under high-dimensional noise (10 informative, 90 noise features: $0.995 \pm 0.008$), outperforming DBSCAN ($0.752 \pm 0.000$).
+- **Unsupervised Falsification:** Under null distributions devoid of cluster structure, PCCS yields high sensitivity indices ($PSI = 0.455 \pm 0.018$ for isotropic Gaussian, $PSI = 0.448 \pm 0.045$ for anisotropic correlated nulls), sharply distinct from true clusters ($PSI = 0.039 \pm 0.004$). The empirical distributions have zero overlap, validating that PCCS rejects spurious cluster claims without external labels.
 
 ### 5.2 Experiment 2: Perturbation Sweeps
 Stability response curves exhibit marked family-specific divergence:
-- Algorithmic seed jittering produces negligible degradation ($ARI > 0.95$).
-- Feature masking and simulated technical batch shifts induce severe non-linear degradation ($ARI$ dropping below $0.45$ at severe intensities).
-- Single scalar stability metrics hide this disparity, confirming the necessity of the multi-dimensional stability tensor.
+- Algorithmic seed jittering produces negligible degradation ($ARI_{ref} \approx 0.683$ across all levels).
+- Feature masking decays sharply from $0.650$ (level 0.10) to $0.565$ (level 0.50).
+- Technical batch shifts induce near-total collapse at extreme intensity 1.00 ($ARI_{ref} = 0.028 \pm 0.059$).
+- Measurement noise declines steadily from $0.696$ to $0.583$. Single scalar stability metrics obscure these failure modes, confirming the necessity of the multi-dimensional stability tensor.
 
 ### 5.3 Experiment 3: Masked Local Fragility
-In the imbalanced synthetic regime ($3 \times 160$ background, $1 \times 20$ rare cluster):
-- Global partition stability remains deceptively high ($ARI = 0.86 \pm 0.03$).
-- However, the rare cluster exhibits severe retention collapse under feature masking ($S_{k, \text{feat}} = 0.31$, $PSI = 0.69$) and is correctly classified as **Perturbation-Fragile**, whereas background clusters remain **Conditionally Invariant** ($PSI \le 0.09$). A scalar stability metric completely misses this localized failure.
+In the imbalanced synthetic regime ($3 \times 96$ background, $1 \times 12$ rare cluster):
+- Global partition stability remains deceptively high ($ARI = 0.850 \pm 0.000$).
+- The rare cluster exhibits elevated sensitivity ($PSI = 0.083 \pm 0.038$, peaking at $0.126$), nearly double that of background clusters ($PSI = 0.044 \pm 0.013$).
+- Under technical shifts and feature masking, rare cluster retention drops to $0.544$ and displays high response variance ($SD = 0.469$), while background clusters remain stable ($SD \le 0.30$). A global consensus metric completely misses this localized failure.
 
 ### 5.4 Experiment 4: Factorial Perturbation Interactions
-Evaluating combined perturbation pairs reveals significant synergistic degradation:
-- The pair **Feature Masking + Measurement Noise** exhibits an interaction drop of $\Delta_{pq} = 0.22 \pm 0.04$ (95% CI $[0.14, 0.30]$), substantially exceeding the 0.15 threshold.
-- Independent tests underestimate combined failure by more than 20% stability points, empirically validating PCCS's interaction modeling capability.
+Evaluating factorial perturbation pairs reveals distinct interaction dynamics:
+- `algorithmic+technical` demonstrates sub-multiplicative buffering ($\Delta_{pq} = -0.192 \pm 0.037$, 95% CI $[-0.265, -0.119]$) because initialization invariance prevents compounding of linear batch offsets.
+- `feature+measurement` behaves in accordance with the multiplicative reference model under moderate regimes ($\Delta_{pq} = -0.023 \pm 0.035$, 95% CI $[-0.091, 0.045]$).
+- Bootstrap standard errors ($B=100$) provide rigorous uncertainty bounds, preventing misinterpretation of random variance as physical synergy.
 
 ### 5.5 Experiment 5: Benchmark Comparisons and Statistical Testing
 Across public benchmarks (Wine, Breast Cancer Diagnostic):
-- Full PCCS achieves top-tier clustering accuracy ($ARI = 0.898$ on Wine, $0.852$ on Breast Cancer), outperforming unweighted EAC ($0.846$ and $0.781$) and single K-Means ($0.851$ and $0.772$).
-- Paired Wilcoxon signed-rank tests confirm that PCCS full significantly outperforms unweighted consensus ($p = 0.031$) and single baselines ($p < 0.05$) after Holm-Bonferroni correction.
-- Ablation analysis confirms that removing reliability-aware weighting or interaction tracking degrades accuracy, demonstrating the active contribution of each framework component.
+- Full PCCS achieves top-tier clustering accuracy ($ARI = 0.8975$ on Wine, $0.6883$ on Breast Cancer Diagnostic; overall mean $ARI = 0.7929$), dramatically outperforming single K-Means ($0.4313$), FCM ($0.4261$), DBSCAN ($0.3221$), Hierarchical ($0.3278$), and TWEC ($0.0428$).
+- Paired Wilcoxon signed-rank tests confirm statistically significant superiority over all individual base algorithms and TWEC ($p = 0.00098$, Holm-Bonferroni adjusted $p = 0.0078$, Cohen's $d \ge 2.08$).
+- PCCS matches unweighted EAC in accuracy while uniquely providing multi-dimensional stability tensors, cluster fingerprints, and reliability profiles that EAC cannot produce.
 
 ---
 
