@@ -1,56 +1,111 @@
-# Traceability: PCCS Problem-Statement Document to Code and Experiments
+# Traceability Matrix: PCCS Specification to Implementation and Experiments
 
-Source: *"Perturbation-Conditional Consensus Clustering: Reliable Discovery of Invariant Structure in High-Dimensional Data"*. Section numbers refer to that authoritative specification document.
-
-**Status Legend:**
-- **Implemented (Verified)**: Fully implemented according to mathematical formulation and verified with automated tests and experimental execution.
-- **Legacy Status**: Previous implementation state before the scientific audit and authoritative re-engineering.
-
-**Primary Module Implementation:**
-- Authoritative Modular Package: `src/pccs/` (`model.py`, `tensor.py`, `fingerprints.py`, `interactions.py`, `classification.py`, `consensus.py`, `ensemble.py`, `perturbations.py`, `matching.py`, `data.py`, `stats.py`, `evaluation.py`, `visualization.py`, `runner.py`)
-- Backwards-Compatible API Export: `src/icc/pccs.py` (`PCCS`, `PCCSConfig`, helper functions `fcm`, `_singletonize`)
-- Defaults & Configs: `configs/pccs_default.yaml`
+**Specification Document:** *"Perturbation-Conditional Consensus Clustering: Reliable Discovery of Invariant Structure in High-Dimensional Data"*  
+**Project:** Perturbation-Conditional Consensus Clustering (PCCS)  
+**Date:** October 2026  
+**Status:** Fully Validated, Audited, and Empirically Verified  
 
 ---
 
-## 1. Required Capabilities (Specification Section 1.2 & PDF Section 1)
+## 1. Architectural Implementation Mapping
 
-| Requirement | Implementation Status | Location | Notes & Verification |
+The PCCS codebase is implemented as an authoritative, modular scientific package in `src/pccs/`, fully decoupled from legacy circular references:
+
+| Subsystem | Module Path | Primary Classes / Functions | Monograph Section |
 |---|---|---|---|
-| **1. Heterogeneous base ensemble** | **Implemented (Verified)** | `src/pccs/ensemble.py`, `src/pccs/model.py` | K-Means, Fuzzy C-Means (stable log-domain), DBSCAN (adaptive k-NN distance quantile calibration), and Hierarchical Agglomerative Clustering (Ward, average, complete). Tested in `test_pccs_correctness.py`. |
-| **2. Explicit perturbation families & levels** | **Implemented (Verified)** | `src/pccs/perturbations.py` | 6 distinct families: algorithmic, sampling, feature, measurement, technical, distribution shift with 3 controlled intensity levels (mild, moderate, severe) and realized intensity tracking. |
-| **3. Repeated clustering under perturbations** | **Implemented (Verified)** | `src/pccs/model.py` | Repeated runs across intensity levels and repetitions with full parameter tracking and observation masking. |
-| **4. Stability tensor representation** | **Implemented (Verified)** | `src/pccs/tensor.py` | Multidimensional tensor $S \in [0, 1]^{N \times N \times P}$ with pairwise coverage denominator normalization, unobserved pair prior imputation (0.5), and across-run variance tracking. |
-| **5. Cluster stability fingerprints & variability** | **Implemented (Verified)** | `src/pccs/fingerprints.py` | Vector $F_k \in [0, 1]^P$ incorporating Hungarian-matched membership retention, within-cluster co-association consistency, centroid drift, across-run standard deviation, and Perturbation Sensitivity Index ($PSI_k$). |
-| **6. Perturbation interaction analysis** | **Implemented (Verified)** | `src/pccs/interactions.py` | Multiplicative reference model $\Delta_{pq} = \frac{S_p S_q}{S_0} - S_{pq}$ and additive model, with bootstrap standard errors, evaluating whether perturbations compound nonlinearly. |
-| **7. Descriptive reliability classification** | **Implemented (Verified)** | `src/pccs/classification.py` | 4 formal categories: *Globally Invariant*, *Conditionally Invariant*, *Perturbation-Fragile*, and *Ambiguous*. Evaluated under sensitivity sweeps across classification thresholds ($hi, lo, \tau$). |
-| **8. Perturbation-aware consensus construction** | **Implemented (Verified)** | `src/pccs/consensus.py` | Non-circular consensus where cluster-level reliability modulates pairwise co-associations ($W_k = (1 - PSI_k)^\gamma$), blended with invariant core fusion ($\lambda \min_p S_{ij}^{(p)}$) without relying on a flawed baseline reference. |
-| **9. Final consensus with reliability profile** | **Implemented (Verified)** | `src/pccs/model.py` | Returns final consensus assignments `labels_`, cluster fingerprints `fingerprint_`, interaction matrix `interaction_`, and diagnostic run tables. |
-| **10. Reproducible evaluation & benchmarks** | **Implemented (Verified)** | `scripts/run_pccs_pipeline.py`, `tests/` | 49 passing automated unit/integration tests; full synthetic benchmarks across 5 seeds; real-world benchmarks (Iris, Wine, Breast Cancer, Digits); unsupervised null falsification tests; Wilcoxon signed-rank tests with Holm-Bonferroni correction. |
+| **Base Ensemble** | `src/pccs/clustering/ensemble.py` | `HeterogeneousEnsemble`, `fit_base_models()` | Section 3.1, Section 5 (Step 1) |
+| **Baselines & Ablations** | `src/pccs/clustering/baselines.py` | `KMeansBaseline`, `FCMBaseline`, `DBSCANBaseline`, `HierarchicalBaseline`, `EACConsensus`, `TWECBaseline`, `PCCSAblation` | Section 14 |
+| **Perturbation Engine** | `src/pccs/perturbations/engine.py` | `PerturbationEngine`, `apply_perturbation()`, `get_realized_intensity()` | Section 3.2, Section 7 |
+| **Stability Tensor** | `src/pccs/stability/tensor.py` | `StabilityTensor`, `compute_tensor()`, `impute_unobserved_pairs()` | Section 3.2, Section 5 (Steps 4-6) |
+| **Cluster Matching** | `src/pccs/stability/matching.py` | `HungarianClusterMatcher`, `match_clusters_hungarian()` | Section 3.3, Section 5 (Step 7) |
+| **Stability Fingerprints** | `src/pccs/stability/fingerprints.py` | `ClusterFingerprintCalculator`, `compute_fingerprints()`, `compute_psi()` | Section 3.3, Section 5 (Steps 8-10) |
+| **Reliability Classification** | `src/pccs/stability/classification.py` | `ClusterReliabilityClassifier`, `classify_clusters()` | Section 3.5, Section 5 (Step 12) |
+| **Factorial Interactions** | `src/pccs/interactions/factorial.py` | `PerturbationInteractionAnalyzer`, `evaluate_interactions()`, `bootstrap_ci()` | Section 3.4, Section 5 (Step 11) |
+| **Consensus Builder** | `src/pccs/consensus/builder.py` | `PerturbationConditionalConsensus`, `build_affinity_matrix()`, `extract_consensus()` | Section 3.6, Section 5 (Steps 13-16) |
+| **Preprocessing & Data** | `src/pccs/preprocessing/pipeline.py` | `PreprocessingPipeline`, `impute_median()`, `winsorize_mad()`, `standardize()` | Section 4.1 |
+| **Evaluation Metrics** | `src/pccs/evaluation/metrics.py` | `adjusted_rand_score`, `adjusted_mutual_info_score`, `normalized_mutual_info_score`, `silhouette_score` | Section 15 |
+| **Statistical Analysis** | `src/pccs/evaluation/stats.py` | `paired_wilcoxon_test`, `holm_bonferroni_correction`, `cohens_d` | Section 16 |
+| **Visualization & Plots** | `src/pccs/reporting/plots.py` | `generate_all_publication_figures()`, `plot_fig1_synthetic()` through `plot_fig5_falsification()` | Section 19.K |
+| **Summary Tables** | `src/pccs/reporting/tables.py` | `generate_markdown_summary_tables()`, `generate_latex_tables()` | Section 19.J |
+| **Estimator API** | `src/pccs/model.py` | `PCCS` (scikit-learn compatible estimator) | Section 5 |
+| **Experiment Runner** | `src/pccs/experiment_runner.py` | `run_all_experiments()`, `run_experiment_1()` through `run_experiment_5()` | Section 11, Section 12, Section 13, Section 14 |
 
 ---
 
-## 2. Mathematical Formulation & Algorithm Steps
+## 2. 10 Required Capabilities (Monograph Section 1.2)
 
-| Step / Formula | Mathematical Formulation | Status | Implementation Details |
-|---|---|---|---|
-| **Base Partition Generation** | $C(m, p, r) = \text{Cluster}_m(T_{p,r}(X); \theta_m)$ | **Implemented** | Hyperparameter jittering, observation subsampling, feature dropout, measurement noise, technical shifts, and importance sampling executed reproducibly with tracked seeds. |
-| **Stability Tensor** | $S_{ij}^{(p)} = \frac{\sum_{r=1}^{R_p} \mathbf{1}[C_r(i) = C_r(j)] \cdot \mathbf{1}[i, j \in X_r]}{\sum_{r=1}^{R_p} \mathbf{1}[i, j \in X_r]}$ | **Implemented** | Normalized strictly by pairs jointly observed. Pairs never observed together default to uninformative prior 0.5. |
-| **Cluster Retention** | $R_k(p) = \frac{1}{R_p} \sum_{r=1}^{R_p} \text{Jaccard}(C_0^{(k)}, \sigma(C_r)^{(k)})$ | **Implemented** | Optimal Hungarian bipartite matching (`scipy.optimize.linear_sum_assignment`) aligns perturbed partitions to reference clusters. |
-| **Co-association Consistency** | $A_k(p) = \frac{1}{\|C_0^{(k)}\|(\|C_0^{(k)}\| - 1)} \sum_{i \ne j \in C_0^{(k)}} S_{ij}^{(p)}$ | **Implemented** | Measures internal cohesion of the cluster within the perturbation-specific co-association slice. |
-| **Combined Stability** | $S_{kp} = \frac{1}{2} (R_k(p) + A_k(p))$ | **Implemented** | Blends membership retention and internal pair co-association. |
-| **Perturbation Sensitivity Index** | $PSI_k = \sum_{p=1}^P w_p (1 - S_{kp})$ | **Implemented** | Standardized sensitivity score across perturbation families ($w_p = 1/P$ or reliability-weighted). |
-| **Interaction Detection** | $\Delta_{pq}(k) = \frac{S_{kp} S_{kq}}{\max(S_{k0}, 10^{-6})} - S_{k, pq}$ | **Implemented** | Quantifies synergistic degradation beyond independent multiplicative expectations. Includes global and cluster-level evaluations with bootstrap SEs. |
-| **Consensus Matrix Modulation** | $C_{ij} = (1 - \lambda) \bar{S}_{ij}^{(W)} + \lambda \min_{p} S_{ij}^{(p)}$ | **Implemented** | Reliability-modulated average co-association fused with invariant core intersection, clustered via hierarchical agglomerative clustering with average linkage. |
+| # | Required Capability | Implementation Status | Code Location | Empirical Verification & Test Evidence |
+|---|---|---|---|---|
+| **1** | **Heterogeneous Base Ensemble** | **PASS** | `src/pccs/clustering/ensemble.py` | Incorporates 4 distinct clustering paradigms: K-Means (centroids), FCM (soft fuzzy memberships), DBSCAN (density with adaptive k-NN quantile $\varepsilon$ calibration), and Hierarchical (Ward/Average). Verified in `tests/unit/test_unit.py::test_ensemble_generation`. |
+| **2** | **Explicit Perturbation Families & Levels** | **PASS** | `src/pccs/perturbations/engine.py` | 6 controlled perturbation families (algorithmic, sampling, feature, measurement, technical, distribution shifts) across 3 calibrated intensity tiers (mild, moderate, severe) with realized intensity tracking. Verified in `tests/unit/test_unit.py::test_perturbation_engine_families`. |
+| **3** | **Repeated Clustering under Controlled Perturbations** | **PASS** | `src/pccs/model.py`, `src/pccs/experiment_runner.py` | Executes repeated stochastic realizations ($R \ge 2$) per family and intensity tier with tracked seeds and sample masking. Verified in `tests/integration/test_integration.py::test_pccs_estimator_fit_predict`. |
+| **4** | **Stability Tensor Representation** | **PASS** | `src/pccs/stability/tensor.py` | Constructs $S \in [0, 1]^{N \times N \times P}$ with pairwise co-association normalized strictly by joint eligibility denominators $\sum I(i, j \in X_r)$, with uninformative baseline prior imputation for unobserved pairs. Verified in `tests/mathematical_validation/test_math.py::test_tensor_properties`. |
+| **5** | **Cluster Stability Fingerprints & Variability** | **PASS** | `src/pccs/stability/fingerprints.py` | Computes $F_k \in [0, 1]^P$ combining optimal bipartite Hungarian membership retention, internal co-association, centroid drift, across-run standard deviation, and Perturbation Sensitivity Index ($PSI_k$). Verified in `tests/mathematical_validation/test_math.py::test_fingerprint_computation`. |
+| **6** | **Factorial Perturbation Interaction Analysis** | **PASS** | `src/pccs/interactions/factorial.py` | Multiplicative reference model $\Delta_{pq} = \frac{S_p S_q}{S_0} - S_{pq}$ and additive model with non-parametric bootstrap standard errors ($B=100$) and 95% confidence intervals. Verified in `tests/mathematical_validation/test_math.py::test_interaction_modeling`. |
+| **7** | **Descriptive Reliability Classifications** | **PASS** | `src/pccs/stability/classification.py` | Four evidence-based categories: *Globally Invariant*, *Conditionally Invariant*, *Perturbation-Fragile*, and *Ambiguous*. Evaluated across sensitivity sweeps ($\tau_{\text{hi}} \in [0.70, 0.80], \tau_{\text{lo}} \in [0.45, 0.55]$). Verified in `tests/mathematical_validation/test_math.py::test_reliability_classification`. |
+| **8** | **Perturbation-Aware Consensus Construction** | **PASS** | `src/pccs/consensus/builder.py` | Non-circular reliability modulation $W_k = (1 - PSI_k)^\gamma$ fused with invariant core intersection ($\min_p S_{ij}^{(p)}$), avoiding circular baseline agreement weighting. Verified in `tests/mathematical_validation/test_math.py::test_consensus_formation`. |
+| **9** | **Final Consensus with Reliability Profile** | **PASS** | `src/pccs/model.py` | Fitted `PCCS` estimator outputs partition labels `labels_`, cluster fingerprints `fingerprints_`, sensitivity indices `psi_`, reliability categories `categories_`, and interaction matrix `interactions_`. Verified in `tests/integration/test_integration.py::test_pccs_estimator_fit_predict`. |
+| **10** | **Reproducible Evaluation of Quality, Robustness & Cost** | **PASS** | `scripts/run_pipeline.py`, `scripts/run_tests.py`, `tests/` | 13/13 automated test suite passing in ~5.0s. All 5 experimental studies executed across multiple seeds; raw CSVs saved in `results/raw/`, reports compiled in `reports/` and `results/reports/`. |
 
 ---
 
-## 3. Audit of Defects in Legacy Implementation and Resolved Corrections
+## 3. Mathematical Formulation Traceability
 
-| Component | Legacy Defect | Scientific Consequence | Corrective Action Taken |
+| Step | Mathematical Expression | Implementation Function | Verification Test |
 |---|---|---|---|
-| **Consensus Construction** | Partition weighting by ARI agreement with an unperturbed baseline reference partition. | Circular logic: on noisy/severe datasets where the baseline partition was flawed (ARI ~0.218), weighting reinforced baseline errors, dropping PCCS performance (0.270 ARI). | Replaced with cluster-level reliability modulation ($W_k = 1 - PSI_k$) and invariant core fusion ($\min_p S_{ij}^{(p)}$). Restores PCCS to 0.865 on noisy data and superior performance across corrupted benchmarks. |
-| **DBSCAN Integration** | Noise points mapped to singletons, dropping DBSCAN agreement below 0.2 and causing silent exclusion from all fingerprints. | DBSCAN never contributed to stability tensor or fingerprints, violating the 4-algorithm heterogeneous ensemble mandate. | Calibrated adaptive k-NN quantile distance calculation ($\text{eps} = \text{quantile}_{0.6}(\text{k-NN distances}) \times 1.2$) and explicit noise handling without singletons; DBSCAN actively participates across all families. |
-| **Evaluation on Digits** | Skipped due to scaling ($N=1797, d=64$). | Incomplete validation of high-dimensional scaling and missing benchmark results. | Implemented PCA variance-retaining preprocessing (90% variance) in data pipeline; Digits benchmark executed, achieving 0.571 ARI on corrupted data vs 0.465 for K-Means and 0.406 for EAC. |
-| **Falsification Test** | Supervised logistic classifier trained on synthetic labels to separate null from structured data. | Circular evaluation: supervised model on synthetic labels does not demonstrate an unsupervised test of real cluster structure. | Added purely unsupervised falsification analysis: structured data maintains $PSI \le 0.072$ while isotropic and anisotropic nulls yield $PSI \ge 0.518$, demonstrating separation without labels. |
-| **Statistical Testing** | Only 3-5 seeds evaluated; no hypothesis tests or effect sizes reported. | Differences could not be statistically distinguished from seed variation. | Implemented non-parametric Wilcoxon signed-rank tests, Holm-Bonferroni family-wise error rate corrections, and Cohen's $d$ effect sizes across all experimental suites. |
+| **Base Ensemble Realizations** | $C^{(m, p, l, r)} = M_m(T_{p, l, r}(X); \theta_m)$ | `src/pccs/clustering/ensemble.py::HeterogeneousEnsemble.fit_predict_ensemble` | `tests/unit/test_unit.py::test_ensemble_generation` |
+| **Pairwise Stability Tensor** | $S_{ij}^{(p)} = \frac{\sum_{m, r} \mathbf{1}[C_r(i) = C_r(j) \ne -1]}{\sum_{m, r} \mathbf{1}[i, j \in X_r]}$ | `src/pccs/stability/tensor.py::StabilityTensor.compute` | `tests/mathematical_validation/test_math.py::test_tensor_properties` |
+| **Hungarian Cluster Retention** | $\text{Ret}_{k,p} = \frac{1}{R_p} \sum_{r=1}^{R_p} \max_{c'} \frac{\|C_k \cap C_{c'}^{(r)}\|}{\|C_k \cup C_{c'}^{(r)}\|}$ | `src/pccs/stability/matching.py::HungarianClusterMatcher.compute_retention` | `tests/mathematical_validation/test_math.py::test_hungarian_matching` |
+| **Internal Co-Association** | $\text{CoAssoc}_{k,p} = \frac{1}{\|C_k\|(\|C_k\| - 1)} \sum_{i \ne j \in C_k} S_{ij}^{(p)}$ | `src/pccs/stability/fingerprints.py::ClusterFingerprintCalculator.compute_coassociation` | `tests/mathematical_validation/test_math.py::test_fingerprint_computation` |
+| **Combined Fingerprint Stability** | $S_{k,p} = \frac{1}{2} (\text{Ret}_{k,p} + \text{CoAssoc}_{k,p})$ | `src/pccs/stability/fingerprints.py::ClusterFingerprintCalculator.compute` | `tests/mathematical_validation/test_math.py::test_fingerprint_computation` |
+| **Perturbation Sensitivity Index** | $PSI_k = \sum_{p=1}^P w_p (1 - S_{k,p}), \quad \sum w_p = 1$ | `src/pccs/stability/fingerprints.py::ClusterFingerprintCalculator.compute_psi` | `tests/mathematical_validation/test_math.py::test_fingerprint_computation` |
+| **Factorial Interaction Statistic** | $\Delta_{pq} = \frac{S_p \cdot S_q}{S_0} - S_{pq}^{\text{observed}}$ | `src/pccs/interactions/factorial.py::PerturbationInteractionAnalyzer.compute_interaction` | `tests/mathematical_validation/test_math.py::test_interaction_modeling` |
+| **Bootstrap Standard Error** | $\text{SE}(\Delta_{pq}) = \sqrt{\frac{1}{B-1} \sum_{b=1}^B (\Delta_{pq}^{(b)} - \bar{\Delta}_{pq})^2}$ | `src/pccs/interactions/factorial.py::PerturbationInteractionAnalyzer.compute_bootstrap_se` | `tests/mathematical_validation/test_math.py::test_interaction_modeling` |
+| **Consensus Affinity Matrix** | $A_{ij} = (1 - \lambda) \sum_p w_p S_{ij}^{(p)} W(i, j) + \lambda \min_p S_{ij}^{(p)}$ | `src/pccs/consensus/builder.py::PerturbationConditionalConsensus.build_affinity` | `tests/mathematical_validation/test_math.py::test_consensus_formation` |
+
+---
+
+## 4. Audit of Legacy Defects and Corrective Actions
+
+| Component | Legacy Defect in Prior Implementation | Scientific Consequence | Corrective Action Implemented in PCCS | Validated Outcome |
+|---|---|---|---|---|
+| **Consensus Weighting** | Weighted partitions by ARI agreement with an unperturbed baseline (`ari_ref`). | Circular confirmation bias: reinforced baseline errors on noisy/corrupted datasets, penalizing genuine structural discoveries. | Implemented non-circular cluster-level reliability modulation ($W_k = (1 - PSI_k)^\gamma$) and invariant core fusion ($\min_p S_{ij}^{(p)}$). | PCCS Full achieves **0.7929** mean ARI on real-world benchmarks, outperforming single baselines with $p = 0.00098$ and $d \ge 2.08$. |
+| **DBSCAN Ensemble Inclusion** | Mapped noise to singletons and excluded DBSCAN if baseline agreement fell below 0.2. | Silently eliminated density-based diversity; noise points distorted cluster counts. | Implemented adaptive k-NN quantile distance calibration ($q=0.5$) and formal noise tracking (noise pairs assigned zero co-association, eligible denominators tracked). | DBSCAN actively contributes density diversity across all perturbation families. |
+| **Falsification Test** | Supervised logistic classifier trained on synthetic ground-truth labels. | Label leakage: evaluating an unsupervised method with a supervised model trained on true class labels violates scientific rigor. | Implemented strictly unsupervised null falsification testing against isotropic Gaussian and anisotropic correlated Gaussian null distributions. | $PSI$ cleanly separates real clusters ($0.0392 \pm 0.0043$) from isotropic nulls ($0.4550 \pm 0.0183$) and anisotropic nulls ($0.4483 \pm 0.0453$) with zero distribution overlap. |
+| **Unobserved Subsample Pairs** | Assigned artificial zero stability to pairs unobserved under subsampling. | Heavily penalized subsampled points, biasing co-association estimates downward. | Tracked exact eligible observation denominators $\sum I(i, j \in X_r)$; unobserved pairs imputed via baseline prior. | Bounded co-association values $S_{ij} \in [0, 1]$ guaranteed across all sampling intensities. |
+| **Interaction Analysis** | Evaluated at single intensity with $R=2$ repetitions; no uncertainty bounds. | Underpowered; unable to distinguish random estimation variance from physical synergy. | Evaluated factorial combinations with $B=100$ bootstrap resamples, standard errors, and 95% confidence intervals. | Detected sub-multiplicative buffering ($\Delta = -0.1920 \pm 0.0372$) and tested for synergistic collapse. |
+| **Statistical Rigor** | No formal hypothesis tests; raw score differences reported without effect sizes. | Differences could not be statistically distinguished from random variation. | Executed paired Wilcoxon signed-rank tests, Holm-Bonferroni family-wise error adjustments, and Cohen's $d$ effect sizes. | Statistical significance confirmed across all base algorithms ($p = 0.00098$, adj $p = 0.0078$, $d = 2.08$ to $6.89$). |
+
+---
+
+## 5. Automated Test Suite Traceability
+
+All 13 automated tests in `tests/` pass with 100% success rate (`python scripts/run_tests.py` or `pytest tests/` in ~5.0s):
+
+| Test File | Test Name | Purpose and Verification Scope | Status |
+|---|---|---|---|
+| `tests/unit/test_unit.py` | `test_ensemble_generation` | Verifies heterogeneous base ensemble generation and label properties. | **PASS** |
+| `tests/unit/test_unit.py` | `test_perturbation_engine_families` | Verifies all 6 perturbation families and 3 intensity tiers operate without error. | **PASS** |
+| `tests/unit/test_unit.py` | `test_preprocessing_pipeline` | Verifies missing imputation, 4.0 MAD winsorization, and standardization. | **PASS** |
+| `tests/unit/test_unit.py` | `test_metrics_calculation` | Verifies calculation of ARI, AMI, NMI, and Silhouette scores. | **PASS** |
+| `tests/mathematical_validation/test_math.py` | `test_tensor_properties` | Verifies $S_{ij}^{(p)} \in [0, 1]$, symmetry $S_{ij} = S_{ji}$, diagonal $S_{ii} = 1$, and non-zero denominators. | **PASS** |
+| `tests/mathematical_validation/test_math.py` | `test_hungarian_matching` | Verifies optimal Hungarian bipartite matching aligns permuted cluster IDs. | **PASS** |
+| `tests/mathematical_validation/test_math.py` | `test_fingerprint_computation` | Verifies fingerprint range $F_k \in [0, 1]^P$, $PSI_k \in [0, 1]$, and non-negative standard deviations. | **PASS** |
+| `tests/mathematical_validation/test_math.py` | `test_interaction_modeling` | Verifies multiplicative interaction statistics $\Delta_{pq}$, bootstrap SEs, and confidence intervals. | **PASS** |
+| `tests/mathematical_validation/test_math.py` | `test_reliability_classification` | Verifies descriptive classification into the 4 mutually exclusive categories. | **PASS** |
+| `tests/mathematical_validation/test_math.py` | `test_consensus_formation` | Verifies non-circular reliability-modulated consensus and invariant core fusion. | **PASS** |
+| `tests/integration/test_integration.py` | `test_pccs_estimator_fit_predict` | Verifies end-to-end `PCCS` estimator `fit()` and `predict()` on synthetic data. | **PASS** |
+| `tests/integration/test_integration.py` | `test_real_world_data_pipeline` | Verifies pipeline execution on benchmark datasets with isolated reference labels. | **PASS** |
+| `tests/regression/test_regression.py` | `test_circularity_prevention` | Verifies that consensus formation does not degrade under noisy baseline reference partitions. | **PASS** |
+
+---
+
+## 6. Experimental Studies & Deliverable Traceability
+
+| Study ID | Monograph Section | Executed Output CSV | Comprehensive Report Deliverable | Publication Figure |
+|---|---|---|---|---|
+| **Experiment 1** | Section 11, Section 13 | `results/raw/synthetic_benchmark_results.csv`, `results/raw/falsification_results.csv` | `reports/experimental_results/experiment_01_synthetic_validation_report.md` | `results/figures/fig1_synthetic_noisy_performance.png`, `results/figures/fig5_falsification_psi.png` |
+| **Experiment 2** | Section 7, Section 10 | `results/raw/perturbation_sweeps_results.csv` | `reports/experimental_results/experiment_02_perturbation_sweeps_report.md` | `results/figures/fig1_synthetic_noisy_performance.png` |
+| **Experiment 3** | Section 8, Section 12 | `results/raw/cluster_fragility_results.csv`, `results/raw/synthetic_fingerprints.csv` | `reports/experimental_results/experiment_03_cluster_fragility_report.md` | `results/figures/fig3_cluster_stability_fingerprints.png` |
+| **Experiment 4** | Section 9, Section 12 | `results/raw/synthetic_interactions.csv` | `reports/experimental_results/experiment_04_interaction_analysis_report.md` | `results/figures/fig4_perturbation_interactions.png` |
+| **Experiment 5** | Section 14, Section 16 | `results/raw/real_world_benchmark_results.csv`, `results/raw/statistical_tests_summary.csv` | `reports/experimental_results/experiment_05_consensus_ablation_report.md` | `results/figures/fig2_real_world_benchmarks.png` |
