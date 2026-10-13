@@ -75,10 +75,12 @@ PCCS/
 │   ├── experimental_results/  Structured markdown reports for Experiments 1-5
 │   └── manuscript/            Full research manuscript draft ready for scientific review
 ├── references/                references.bib and dataset_sources.md
-└── scripts/
-    ├── run_experiments.py     Executes Experiments 1 through 5
-    ├── run_tests.py           Runs the complete automated test suite
-    └── generate_reports.py    Compiles markdown reports from raw CSV outputs
+├── scripts/
+│   ├── run_experiments.py     Executes Experiments 1 through 5
+│   ├── run_tests.py           Runs the complete automated test suite
+│   └── generate_reports.py    Compiles markdown reports from raw CSV outputs
+├── CHANGELOG.md               Complete project changelog and version release history
+└── pccs_traceability.md       Comprehensive specification-to-code traceability matrix
 ```
 
 ---
